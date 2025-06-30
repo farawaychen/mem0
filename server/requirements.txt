@@ -1,7 +1,7 @@
 fastapi==0.115.8
 uvicorn==0.34.0
 pydantic>=2.11.7
-mem0ai>=0.1.48
+mem0ai>=0.1.111
 python-dotenv==1.0.1
 ollama>=0.5.1
 pymilvus>=2.5.11
