@@ -186,7 +186,7 @@ class MemoryGraph:
             messages=[
                 {
                     "role": "system",
-                    "content": f"You are a smart assistant who understands entities and their types in a given text. If user message contains self reference such as 'I', 'me', 'my' etc. then use {filters['user_id']} as the source entity. Extract all the entities from the text. ***DO NOT*** answer the question itself if the given text is a question.",
+                    "content": f"你是一款信息提取助手，能够从给定文本中理解并提取出实体及其类型，如果用户消息中包含自我提及的词汇，如“我”、“我本人”、“我的”或则有很强的与吃穿住行相关的意图时，则将 {filters['user_id']} 用作源实体，并且从提供的工具中选择适合的工具从文本中提取所有实体。重点：不要回答该问题本身，只做信息提取。",
                 },
                 {"role": "user", "content": data},
             ],
