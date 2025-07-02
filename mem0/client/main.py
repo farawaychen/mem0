@@ -958,7 +958,7 @@ class AsyncMemoryClient:
                 timeout=300,
             )
 
-        self.user_email = self._validate_api_key()
+        # self.user_email = self._validate_api_key()
         capture_client_event("client.init", self, {"sync_type": "async"})
 
     def _validate_api_key(self):

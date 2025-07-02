@@ -81,10 +81,11 @@ def capture_event(event_name, memory_instance, additional_data=None):
 
 
 def capture_client_event(event_name, instance, additional_data=None):
-    event_data = {
-        "function": f"{instance.__class__.__module__}.{instance.__class__.__name__}",
-    }
-    if additional_data:
-        event_data.update(additional_data)
+    pass
+    # event_data = {
+    #     "function": f"{instance.__class__.__module__}.{instance.__class__.__name__}",
+    # }
+    # if additional_data:
+    #     event_data.update(additional_data)
 
-    client_telemetry.capture_event(event_name, event_data, instance.user_email)
+    # client_telemetry.capture_event(event_name, event_data, instance.user_email)
