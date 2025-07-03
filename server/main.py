@@ -3,7 +3,7 @@ import os
 from typing import Any, Dict, List, Optional
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
@@ -64,6 +64,7 @@ app = FastAPI(
     version="1.0.0",
 )
 
+router = APIRouter(prefix="/v1", tags=["api"])
 
 class Message(BaseModel):
     role: str = Field(..., description="Role of the message (user or assistant).")
@@ -86,7 +87,7 @@ class SearchRequest(BaseModel):
     filters: Optional[Dict[str, Any]] = None
 
 
-@app.post("/configure", summary="Configure Mem0")
+@router.post("/configure", summary="Configure Mem0")
 def set_config(config: Dict[str, Any]):
     """Set memory configuration."""
     global MEMORY_INSTANCE
@@ -94,7 +95,7 @@ def set_config(config: Dict[str, Any]):
     return {"message": "Configuration set successfully"}
 
 
-@app.post("/memories", summary="Create memories")
+@router.post("/memories", summary="Create memories")
 def add_memory(memory_create: MemoryCreate):
     """Store new memories."""
     if not any([memory_create.user_id, memory_create.agent_id, memory_create.run_id]):
@@ -109,7 +110,7 @@ def add_memory(memory_create: MemoryCreate):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/memories", summary="Get memories")
+@router.get("/memories", summary="Get memories")
 def get_all_memories(
     user_id: Optional[str] = None,
     run_id: Optional[str] = None,
@@ -128,7 +129,7 @@ def get_all_memories(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/memories/{memory_id}", summary="Get a memory")
+@router.get("/memories/{memory_id}", summary="Get a memory")
 def get_memory(memory_id: str):
     """Retrieve a specific memory by ID."""
     try:
@@ -138,7 +139,7 @@ def get_memory(memory_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/search", summary="Search memories")
+@router.post("/search", summary="Search memories")
 def search_memories(search_req: SearchRequest):
     """Search for memories based on a query."""
     try:
@@ -149,7 +150,7 @@ def search_memories(search_req: SearchRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.put("/memories/{memory_id}", summary="Update a memory")
+@router.put("/memories/{memory_id}", summary="Update a memory")
 def update_memory(memory_id: str, updated_memory: Dict[str, Any]):
     """Update an existing memory."""
     try:
@@ -159,7 +160,7 @@ def update_memory(memory_id: str, updated_memory: Dict[str, Any]):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/memories/{memory_id}/history", summary="Get memory history")
+@router.get("/memories/{memory_id}/history", summary="Get memory history")
 def memory_history(memory_id: str):
     """Retrieve memory history."""
     try:
@@ -169,7 +170,7 @@ def memory_history(memory_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.delete("/memories/{memory_id}", summary="Delete a memory")
+@router.delete("/memories/{memory_id}", summary="Delete a memory")
 def delete_memory(memory_id: str):
     """Delete a specific memory by ID."""
     try:
@@ -180,7 +181,7 @@ def delete_memory(memory_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.delete("/memories", summary="Delete all memories")
+@router.delete("/memories", summary="Delete all memories")
 def delete_all_memories(
     user_id: Optional[str] = None,
     run_id: Optional[str] = None,
@@ -200,7 +201,7 @@ def delete_all_memories(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/reset", summary="Reset all memories")
+@router.post("/reset", summary="Reset all memories")
 def reset_memory():
     """Completely reset stored memories."""
     try:
@@ -211,7 +212,9 @@ def reset_memory():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/", summary="Redirect to the OpenAPI documentation", include_in_schema=False)
+@router.get("/", summary="Redirect to the OpenAPI documentation", include_in_schema=False)
 def home():
     """Redirect to the OpenAPI documentation."""
     return RedirectResponse(url="/docs")
+
+app.include_router(router)
