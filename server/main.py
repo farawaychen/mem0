@@ -139,7 +139,7 @@ def get_memory(memory_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/search", summary="Search memories")
+@router.post("/memories/search", summary="Search memories")
 def search_memories(search_req: SearchRequest):
     """Search for memories based on a query."""
     try:
