@@ -905,6 +905,7 @@ class AsyncMemoryClient:
         host: Optional[str] = None,
         org_id: Optional[str] = None,
         project_id: Optional[str] = None,
+        user_id: Optional[str] = None,
         client: Optional[httpx.AsyncClient] = None,
     ):
         """Initialize the AsyncMemoryClient.
@@ -928,7 +929,7 @@ class AsyncMemoryClient:
         self.host = host or "https://api.mem0.ai"
         self.org_id = org_id
         self.project_id = project_id
-        self.user_id = get_user_id()
+        self.user_id = user_id
 
         if not self.api_key:
             raise ValueError(
@@ -936,7 +937,7 @@ class AsyncMemoryClient:
             )
 
         # Create MD5 hash of API key for user_id
-        self.user_id = hashlib.md5(self.api_key.encode()).hexdigest()
+        # self.user_id = hashlib.md5(self.api_key.encode()).hexdigest()
 
         if client is not None:
             self.async_client = client
