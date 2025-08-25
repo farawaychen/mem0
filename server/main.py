@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 from typing import Any, Dict, List, Optional
 
 from dotenv import load_dotenv
@@ -9,16 +10,32 @@ from pydantic import BaseModel, Field
 
 from mem0 import Memory
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stderr),
+        logging.FileHandler('log/app.log')
+    ]    
+)
 # Load environment variables
 load_dotenv()
 
-OPENAI_BASE_URL = os.environ.get("POSTGOPENAI_BASE_URLES_HOST", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+OPENAI_BASE_URL = os.environ.get("OPENAI_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY","sk-a674bec0549d40d5b8f7bb8b67689cd1")
+LLM_MODEL = os.environ.get("LLM_MODEL", "qwen-plus")
+VLLM_MODEL = os.environ.get("VLLM_MODEL", "qwen-vl-plus")
+LLM_MODEL_TEMPERATURE = os.environ.get("LLM_MODEL_TEMPERATURE", "0.7")
+
+EMBEDDING_MODEL = os.environ.get("EMBEDDING_MODEL", "bge-m3:latest")
+EMBEDDING_URL = os.environ.get("EMBEDDING_URL", "http://192.168.111.10:11434")
+EMBEDDING_DIMS = os.environ.get("EMBEDDING_DIMS", "1024")
 
 POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "postgres")
 POSTGRES_PORT = os.environ.get("POSTGRES_PORT", "5432")
+
 MILVUS_URL = os.environ.get("MILVUS_HOST", "http://192.168.111.10:19530")
+
 POSTGRES_DB = os.environ.get("POSTGRES_DB", "postgres")
 POSTGRES_USER = os.environ.get("POSTGRES_USER", "postgres")
 POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "postgres")
@@ -27,13 +44,14 @@ COLLECTION_NAME = os.environ.get("COLLECTION_NAME", "mem0")
 NEO4J_URI = os.environ.get("NEO4J_URI", "bolt://192.168.111.10:7687")
 NEO4J_USERNAME = os.environ.get("NEO4J_USERNAME", "neo4j")
 NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD", "welo123456")
+NEO4J_DATABASE = os.environ.get("NEO4J_DATABASE", "neo4j")
 
 MEMGRAPH_URI = os.environ.get("MEMGRAPH_URI", "bolt://localhost:7687")
 MEMGRAPH_USERNAME = os.environ.get("MEMGRAPH_USERNAME", "memgraph")
 MEMGRAPH_PASSWORD = os.environ.get("MEMGRAPH_PASSWORD", "mem0graph")
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY","sk-a674bec0549d40d5b8f7bb8b67689cd1")
-HISTORY_DB_PATH = os.environ.get("HISTORY_DB_PATH", "/data/one/chao.chen/code/mem0welo/mem0welo.db")
+
+HISTORY_DB_PATH = os.environ.get("HISTORY_DB_PATH", "/app/data/mem0welo.db")
 
 DEFAULT_CONFIG = {
     "version": "v1.1",
@@ -42,16 +60,16 @@ DEFAULT_CONFIG = {
         "config": {
             "url": MILVUS_URL,
             "collection_name": COLLECTION_NAME,
-            "embedding_model_dims":1024
+            "embedding_model_dims":int(EMBEDDING_DIMS)
         },
     },
     "graph_store": {
         "provider": "neo4j",
-        "config": {"url": NEO4J_URI, "username": NEO4J_USERNAME, "password": NEO4J_PASSWORD,"database": "neo4j"},
+        "config": {"url": NEO4J_URI, "username": NEO4J_USERNAME, "password": NEO4J_PASSWORD,"database": NEO4J_DATABASE},
     },
-    "llm": {"provider": "openai", "config": {"api_key": OPENAI_API_KEY, "temperature": 0.7, "model": "qwen-plus","openai_base_url":OPENAI_BASE_URL}},
-    "vllm": {"provider": "openai", "config": {"api_key": OPENAI_API_KEY, "temperature": 0.7, "model": "qwen-vl-plus","openai_base_url":OPENAI_BASE_URL}},
-    "embedder": {"provider": "ollama", "config": {"model": "bge-m3","embedding_dims":1024, "ollama_base_url": "http://192.168.111.10:11434"}},
+    "llm": {"provider": "openai", "config": {"api_key": OPENAI_API_KEY, "temperature": float(LLM_MODEL_TEMPERATURE), "model": LLM_MODEL,"openai_base_url":OPENAI_BASE_URL}},
+    "vllm": {"provider": "openai", "config": {"api_key": OPENAI_API_KEY, "temperature": float(LLM_MODEL_TEMPERATURE), "model": VLLM_MODEL,"openai_base_url":OPENAI_BASE_URL}},
+    "embedder": {"provider": "ollama", "config": {"model": EMBEDDING_MODEL,"embedding_dims":int(EMBEDDING_DIMS), "ollama_base_url": EMBEDDING_URL}},
     "history_db_path": HISTORY_DB_PATH,
 }
 
